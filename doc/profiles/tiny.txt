@@ -1,0 +1,65 @@
+
+CirBASIC Tiny profile
+
+Based on Tiny BASIC, but probably different enough to be annoying. For instance, CLEAR is renamed to NEW to be more consistent with other implementations. As a side effect, "END" is the start of the list of valid statements in alphabetical order. I refuse to undo this for the Tiny profile.
+
+Command string comparisons are case insensitive.
+
+Every line that isn't a valid command actually throws an error, unlike in the Hello profile.
+
+Whitespace is 0x20 (space) and 0x09 (tab).
+
+Numbers are 32-bit signed ints. Line numbers are 16-bit unsigned ints. Overflow is undefined for regular numbers, and errors should happen where line numbers overflow. Line number overflow errors do not occur when the program counter goes past the last line of the code - rather, a graceful exit occurs.
+
+Recommended implementation order:
+
+* Hello profile (RUN)
+* Make all unrecognised commands a syntax error
+* LIST
+* NEW
+* REM
+* GOTO w/ static unsigned int
+* GOSUB/RETURN
+* expr as signed int; make GOTO/GOSUB use expr
+* PRINT
+* LET
+* expr variable
+* INPUT
+* ( expr )
+* op1/op2
+* IF
+
+Syntax:
+
+    line ::= digit+ WS* | digit+ WS+ stmt WS* | WS* stmt WS*
+
+    stmt ::= "END"
+        | "GOSUB" WS+ expr
+        | "GOTO" WS+ expr
+        | "IF" WS+ expr WS* relop WS* expr WS+ "THEN" WS+ stmt
+        | "INPUT" WS+ var
+        | "LET" WS+ var WS* '=' WS* expr
+        | "LIST"
+        | "NEW"
+        | "PRINT" WS+ expr
+        | "REM" (WS ANY*)?
+        | "RETURN"
+        | "RUN"
+
+    expr ::= op1
+    op1 ::= op2 (WS* ('+' | '-') WS* op1)
+    op2 ::= term (WS* ('*' | '/' | '%') WS* op2)
+    term ::= var | sint | ('(' WS* expr WS* ')')
+
+    sint = ('+' | '-') digit+
+
+    //relop ::= "<" | ">" | "<=" | ">=" | "=" | "<>" | "><"
+    relop ::= ("<" | ">" | "=")+ // Yes, this is very lenient.
+    var ::= 'A' - 'Z'
+    digit ::= '0' - '9'
+
+Limits:
+
+* Command input buffer length: 255 bytes (excluding newline)
+* GOSUB/RETURN stack: 63 entries
+

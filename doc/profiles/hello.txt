@@ -1,0 +1,20 @@
+CirBASIC Hello profile
+
+Completely useless to actually code with, but it provides a nice early milestone for implementors to feel good about themselves and carry on to the next profile.
+
+Command string comparisons are case insensitive.
+
+Every line that isn't "RUN" is printed in the form "line %s\n".
+
+Whitespace is 0x20 (space) and 0x09 (tab).
+
+Syntax:
+
+    line ::= digit WS+ stmt | WS* stmt
+    stmt ::= "RUN" | ANY*
+    digit ::= '0' - '9'
+
+Limits:
+
+* Command input buffer length: 255 bytes (excluding newline)
+
